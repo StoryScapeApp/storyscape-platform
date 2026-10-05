@@ -8,3 +8,4 @@ coverage/
 *.tsbuildinfo
 teacher-pwa/dev-dist/
 backend/src/generated/prisma/
+backend/.local-postgres/
