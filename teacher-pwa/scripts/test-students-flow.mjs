@@ -38,7 +38,8 @@ try {
   assert.equal(await page.getByText(`Estudiante ${fixtures.students[2].code}`).count(), 0);
   assert.equal(await page.getByText('Sessions: 2').count(), 1);
   await page.getByRole('link', { name: `Estudiante ${fixtures.students[0].code}` }).click();
-  await page.getByText('Los resultados detallados se incorporarán en la siguiente etapa.').waitFor();
+  await page.getByRole('heading', { name: 'Reading sessions' }).waitFor();
+  assert.equal(await page.getByRole('link', { name: /hu49-test-fixture/ }).count(), 2);
   assert.equal(await page.getByText(`Estudiante ${fixtures.students[0].code}`).count(), 1);
   assert.equal(await page.getByText('Sessions: 2').count(), 1);
 

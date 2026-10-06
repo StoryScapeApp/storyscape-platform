@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getJson } from '../lib/http-client';
 
 interface StudentSummary {
@@ -9,16 +9,33 @@ interface StudentSummary {
   lastSessionAt: string;
 }
 
+interface ReadingSessionSummary {
+  id: string;
+  bookRefId: string;
+  startedAt: string;
+  completedAt: string | null;
+}
+
 export function StudentDetailPage() {
   const { studentId } = useParams();
   const [student, setStudent] = useState<StudentSummary | null>(null);
+  const [sessions, setSessions] = useState<ReadingSessionSummary[] | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!studentId) return;
     let active = true;
-    getJson<StudentSummary>(`/students/${encodeURIComponent(studentId)}`).then((data) => {
-      if (active) setStudent(data);
+    setStudent(null);
+    setSessions(null);
+    setError(false);
+    Promise.all([
+      getJson<StudentSummary>(`/students/${encodeURIComponent(studentId)}`),
+      getJson<ReadingSessionSummary[]>(`/students/${encodeURIComponent(studentId)}/sessions`),
+    ]).then(([studentData, sessionData]) => {
+      if (active) {
+        setStudent(studentData);
+        setSessions(sessionData);
+      }
     }).catch(() => {
       if (active) setError(true);
     });
@@ -34,7 +51,19 @@ export function StudentDetailPage() {
         <p>Estudiante {student.code}</p>
         <p>Sessions: {student.sessionCount}</p>
         <p>Last session: {new Date(student.lastSessionAt).toLocaleString()}</p>
-        <p>Los resultados detallados se incorporarán en la siguiente etapa.</p>
+        <h2>Reading sessions</h2>
+        {sessions === null && <p role="status">Loading sessions...</p>}
+        {sessions?.length === 0 && <p>No hay sesiones registradas para este estudiante.</p>}
+        {sessions && sessions.length > 0 && <ul>
+          {sessions.map((session) => (
+            <li key={session.id}>
+              <Link to={`/sessions/${session.id}`}>
+                {new Date(session.startedAt).toLocaleString()} · {session.bookRefId}
+              </Link>
+              <p>{session.completedAt ? 'Completada' : 'En curso'}</p>
+            </li>
+          ))}
+        </ul>}
       </>}
     </main>
   );
