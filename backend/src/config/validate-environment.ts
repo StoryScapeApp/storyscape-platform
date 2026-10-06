@@ -21,5 +21,40 @@ export function validateEnvironment(config: Environment): Environment {
     throw new Error('DATABASE_URL must be a PostgreSQL connection URL');
   }
 
-  return { ...config, PORT: port, CORS_ORIGIN: origin, DATABASE_URL: databaseUrl };
+  const jwtSecret = String(config.JWT_SECRET ?? '');
+  if (Buffer.byteLength(jwtSecret) < 32) {
+    throw new Error('JWT_SECRET must contain at least 32 bytes');
+  }
+
+  const jwtExpiresIn = Number(config.JWT_EXPIRES_IN ?? 3600);
+  if (!Number.isInteger(jwtExpiresIn) || jwtExpiresIn < 1) {
+    throw new Error('JWT_EXPIRES_IN must be a positive number of seconds');
+  }
+
+  const cookieSecure = config.COOKIE_SECURE ?? (config.NODE_ENV === 'production' ? 'true' : 'false');
+  if (cookieSecure !== 'true' && cookieSecure !== 'false') {
+    throw new Error('COOKIE_SECURE must be true or false');
+  }
+
+  const cookieSameSite = String(config.COOKIE_SAME_SITE ?? 'lax');
+  if (!['lax', 'strict', 'none'].includes(cookieSameSite)) {
+    throw new Error('COOKIE_SAME_SITE must be lax, strict, or none');
+  }
+  if (cookieSameSite === 'none' && cookieSecure !== 'true') {
+    throw new Error('COOKIE_SAME_SITE=none requires COOKIE_SECURE=true');
+  }
+  if (config.NODE_ENV === 'production' && cookieSecure !== 'true') {
+    throw new Error('COOKIE_SECURE must be true in production');
+  }
+
+  return {
+    ...config,
+    PORT: port,
+    CORS_ORIGIN: origin,
+    DATABASE_URL: databaseUrl,
+    JWT_SECRET: jwtSecret,
+    JWT_EXPIRES_IN: jwtExpiresIn,
+    COOKIE_SECURE: cookieSecure === 'true',
+    COOKIE_SAME_SITE: cookieSameSite,
+  };
 }
