@@ -79,7 +79,7 @@ async function main() {
   const secure = process.env.COOKIE_SECURE === 'true';
   assert.match(setCookie, new RegExp(`SameSite=${sameSite}`, 'i'));
   assert.equal(/(?:^|;)\s*Secure(?:;|$)/i.test(setCookie), secure);
-  assert.match(login.response.headers.get('access-control-allow-origin'), /^http:\/\/localhost:5173$/);
+  assert.equal(login.response.headers.get('access-control-allow-origin'), process.env.CORS_ORIGIN || 'http://localhost:5173');
   assert.equal(login.response.headers.get('access-control-allow-credentials'), 'true');
   assert.notEqual(login.response.headers.get('access-control-allow-origin'), '*');
   const cookie = setCookie.split(';')[0];
