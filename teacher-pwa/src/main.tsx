@@ -4,15 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import { AppRoutes } from './routes/AppRoutes';
 import { AuthProvider } from './auth/AuthContext';
-
+import './styles.css';
 registerSW({ immediate: true });
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
-);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><AuthProvider><AppRoutes/></AuthProvider></BrowserRouter></React.StrictMode>);

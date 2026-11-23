@@ -14,6 +14,7 @@
     "test:sessions": "node scripts/test-session-results-flow.cjs",
     "test:progress": "node scripts/test-progress-flow.cjs",
     "test:unity": "node scripts/test-unity-ingest-flow.cjs",
+    "test:dashboard": "node scripts/test-dashboard-flow.cjs",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate"
   },

@@ -1,3 +1,2 @@
-export function PlaceholderPage({ title }: { title: string }) {
-  return <main><h1>{title}</h1></main>;
-}
+import { Link } from 'react-router-dom';
+export function PlaceholderPage({ title='Página no encontrada' }: { title?: string }) { return <section className="surface empty-state"><img src="/art/principito-reposo.png" alt=""/><div><p className="eyebrow">UN PEQUEÑO DESVÍO</p><h1 className="page-title">{title}</h1><p>Esta página no aparece en el mapa. Puede regresar al panel y continuar el recorrido.</p><Link to="/dashboard">Volver al panel</Link></div></section>; }

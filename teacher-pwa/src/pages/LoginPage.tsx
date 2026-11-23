@@ -1,42 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-
-export function LoginPage() {
-  const auth = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-
-  if (auth.status === 'loading') return <main><p>Loading...</p></main>;
-  if (auth.status === 'authenticated') return <Navigate to="/dashboard" replace />;
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitting(true);
-    setError('');
-    try {
-      await auth.login(email, password);
-      navigate('/dashboard', { replace: true });
-    } catch {
-      setError('Invalid email or password.');
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <main>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} />
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
-        <button type="submit" disabled={submitting}>{submitting ? 'Signing in...' : 'Sign in'}</button>
-        {error && <p role="alert">{error}</p>}
-      </form>
-    </main>
-  );
-}
+import './LoginPage.css';
+export function LoginPage(){const auth=useAuth();const navigate=useNavigate();const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[submitting,setSubmitting]=useState(false);const[error,setError]=useState('');if(auth.status==='loading')return <main className="auth-loading" role="status">Preparando el portal…</main>;if(auth.status==='authenticated')return <Navigate to="/dashboard" replace/>;async function handleSubmit(event:FormEvent<HTMLFormElement>){event.preventDefault();setSubmitting(true);setError('');try{await auth.login(email,password);navigate('/dashboard',{replace:true})}catch{setError('Correo o contraseña incorrectos');setSubmitting(false)}}return <main className="login-page"><section className="login-hero" aria-label="StoryScape para docentes"><img className="login-sky" src="/art/fondo-prologo.jpg" alt=""/><span className="login-star star-one" aria-hidden="true">✦</span><span className="login-star star-two" aria-hidden="true">✦</span><div className="login-brand">StoryScape <span>· Portal docente</span></div><div className="hero-copy"><p className="eyebrow">Una aventura de lectura, paso a paso</p><h1>Sigue el progreso lector de tu clase, página a página.</h1><p>Una mesa de lectura interactiva para acompañar cada descubrimiento de <em>El Principito</em>.</p></div><img className="hero-prince" src="/art/principito-saludo.png" alt="" loading="lazy"/><img className="hero-planet" src="/art/planeta.png" alt="" loading="lazy"/></section><section className="login-side"><div className="login-card surface"><img src="/art/estrella.png" alt="" className="login-card-star"/><p className="eyebrow">Bienvenido al viaje</p><h2>Iniciar sesión</h2><p className="login-intro">Ingrese sus datos para ver cómo avanza su clase.</p><form onSubmit={handleSubmit}><label htmlFor="email">Correo</label><input id="email" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/><label htmlFor="password">Contraseña</label><input id="password" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>{error&&<p className="login-error" role="alert">{error}</p>}<button type="submit" disabled={submitting}>{submitting?'Entrando…':'Entrar'}<span aria-hidden="true">→</span></button></form><p className="login-footnote">Un espacio seguro para acompañar cada lectura.</p></div></section></main>}

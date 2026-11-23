@@ -19,7 +19,7 @@ export function AppRoutes() {
         <Route path="/students/:studentId" element={<StudentDetailPage />} />
         <Route path="/sessions/:sessionId" element={<SessionDetailPage />} />
         <Route path="/progress" element={<ProgressPage />} />
-        <Route path="*" element={<PlaceholderPage title="Page Not Found" />} />
+        <Route path="*" element={<PlaceholderPage title="Página no encontrada" />} />
       </Route>
     </Routes>
   );

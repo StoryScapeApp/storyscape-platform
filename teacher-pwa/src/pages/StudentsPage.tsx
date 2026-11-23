@@ -1,45 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getJson } from '../lib/http-client';
+import { useEffect, useMemo, useState } from 'react';import { Link } from 'react-router-dom';import { getJson } from '../lib/http-client';import './StudentsPage.css';
+interface StudentSummary{id:string;code:string;name:string|null;sessionCount:number;lastSessionAt:string}
+export function StudentsPage(){const[students,setStudents]=useState<StudentSummary[]|null>(null);const[error,setError]=useState(false);const[query,setQuery]=useState('');useEffect(()=>{let active=true;getJson<StudentSummary[]>('/students').then(d=>{if(active)setStudents(d)}).catch(()=>{if(active)setError(true)});return()=>{active=false}},[]);const filtered=useMemo(()=>students?.filter(s=>`${s.name||''} ${s.code}`.toLocaleLowerCase().includes(query.toLocaleLowerCase().trim()))??[],[students,query]);return <div className="students-page"><header><p className="eyebrow">SU CLASE · STORYSCAPE</p><h1 className="page-title">Estudiantes</h1><p className="page-lede">Cada recorrido lector, a su propio ritmo.</p></header><section className="surface student-directory"><div className="directory-tools"><div><h2>Su grupo</h2><p>{students?.length??0} estudiantes con lecturas registradas</p></div><label className="search-field"><span>Buscar</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Nombre o código" aria-label="Buscar estudiante por nombre o código"/></label></div>{!students&&!error&&<p role="status" className="notice">Cargando estudiantes…</p>}{error&&<p role="alert" className="notice error">No se pudieron cargar los estudiantes. Inténtelo nuevamente.</p>}{students?.length===0&&<div className="empty-state"><img src="/art/principito-reposo.png" alt="" loading="lazy"/><div><h2>Aún no hay estudiantes</h2><p>Cuando llegue la primera lectura, aparecerá aquí.</p></div></div>}{students&&students.length>0&&filtered.length===0&&<p className="notice">No hay estudiantes que coincidan con la búsqueda.</p>}{filtered.length>0&&<div className="directory-scroll"><table className="student-table" aria-label="Lista de estudiantes"><thead><tr><th>Estudiante</th><th>Código</th><th>Sesiones</th><th>Última sesión</th><th>Progreso</th></tr></thead><tbody>{filtered.map(s=><tr key={s.id}><td><span className="student-cell"><span className="student-avatar" aria-hidden="true">{initials(s.name)}</span><strong>{s.name||'Sin nombre'}</strong></span></td><td><span className="code-pill">{s.code}</span></td><td>{s.sessionCount}</td><td>{new Date(s.lastSessionAt).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'})}</td><td><Link className="table-action" to={`/progress?studentId=${encodeURIComponent(s.id)}`}>Ver progreso <span aria-hidden="true">→</span></Link></td></tr>)}</tbody></table></div>}</section></div>}
 
-interface StudentSummary {
-  id: string;
-  code: string;
-  sessionCount: number;
-  lastSessionAt: string;
-}
-
-export function StudentsPage() {
-  const [students, setStudents] = useState<StudentSummary[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    getJson<StudentSummary[]>('/students').then((data) => {
-      if (active) setStudents(data);
-    }).catch(() => {
-      if (active) setError(true);
-    });
-    return () => { active = false; };
-  }, []);
-
-  return (
-    <main>
-      <h1>Students</h1>
-      {students === null && !error && <p role="status">Loading students...</p>}
-      {error && <p role="alert">Unable to load students. Please try again.</p>}
-      {students?.length === 0 && <p>No hay estudiantes con sesiones registradas.</p>}
-      {students && students.length > 0 && (
-        <ul>
-          {students.map((student) => (
-            <li key={student.id}>
-              <Link to={`/students/${student.id}`}>Estudiante {student.code}</Link>
-              <p>Sessions: {student.sessionCount}</p>
-              <p>Last session: {new Date(student.lastSessionAt).toLocaleString()}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
-  );
-}
+function initials(name:string|null){return name?.trim().split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0].toLocaleUpperCase()).join('')||'S'}
