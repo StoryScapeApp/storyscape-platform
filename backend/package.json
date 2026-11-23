@@ -16,7 +16,8 @@
     "test:unity": "node scripts/test-unity-ingest-flow.cjs",
     "test:dashboard": "node scripts/test-dashboard-flow.cjs",
     "prisma:validate": "prisma validate",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "seed:demo": "node scripts/seed-demo-data.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.2",

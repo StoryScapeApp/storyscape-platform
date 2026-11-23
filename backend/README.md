@@ -36,3 +36,26 @@ The seed is explicit and stores only an Argon2id hash. Remove the seed variables
 With the API running and a seed professor available, `npm run test:auth` checks the authentication flow without printing credentials or tokens.
 
 `POST /auth/login` sets an HttpOnly cookie and returns `{ id, email }`. `GET /auth/me` validates that cookie. `POST /auth/logout` clears it. The cookie is valid until its JWT expires; this MVP does not revoke already issued JWTs server-side.
+
+## Unity results (portal ingest)
+
+The Unity reading table sends quiz results to this API; the teacher sees them in the PWA under **Progreso** and **Panel**. Unity authenticates with an API key (not the teacher cookie).
+
+1. Generate a key and put it in the ignored `.env`, together with the email of the professor who will own the students Unity creates:
+
+   ```sh
+   openssl rand -hex 32          # use the output as UNITY_INGEST_KEY
+   ```
+
+   ```
+   UNITY_INGEST_KEY=<the key>
+   UNITY_PROFESSOR_EMAIL=<email of an existing professor, see seed:professor above>
+   ```
+
+   Without both variables the `/unity/*` endpoints answer 503.
+2. Apply the migrations (`npx prisma migrate dev`) and restart the API.
+3. Put the same key and the API URL in the Unity project (`Assets/StreamingAssets/portal.local.json`, see the Unity repo README, section "Portal del docente").
+
+Endpoints (header `x-api-key`): `POST /unity/sessions`, `POST /unity/sessions/:id/responses`, `POST /unity/sessions/:id/complete`. Teacher endpoints added for the dashboard and progress screens: `GET /dashboard/summary` and the progress-detail routes under `/progress`.
+
+Checks (API running, seed professor available): `npm run test:unity`, `npm run test:dashboard`. To fill a demo portal with example students (Mateo, Valentina, Sofía, Diego, Lucía) run `npm run seed:demo`; it uses the same ingest API, so `UNITY_INGEST_KEY` must be set.
