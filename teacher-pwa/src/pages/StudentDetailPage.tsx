@@ -49,6 +49,7 @@ export function StudentDetailPage() {
       {error && <p role="alert">Unable to load student.</p>}
       {student && <>
         <p>Estudiante {student.code}</p>
+        <p><Link to={`/progress?studentId=${encodeURIComponent(student.id)}`}>Ver progreso histórico</Link></p>
         <p>Sessions: {student.sessionCount}</p>
         <p>Last session: {new Date(student.lastSessionAt).toLocaleString()}</p>
         <h2>Reading sessions</h2>

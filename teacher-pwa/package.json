@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test:auth": "node --env-file=../backend/.env scripts/test-auth-flow.mjs",
     "test:students": "node --env-file=../backend/.env scripts/test-students-flow.mjs",
-    "test:sessions": "node --env-file=../backend/.env scripts/test-session-results-flow.mjs"
+    "test:sessions": "node --env-file=../backend/.env scripts/test-session-results-flow.mjs",
+    "test:progress": "node --env-file=../backend/.env scripts/test-progress-flow.mjs"
   },
   "dependencies": {
     "react": "^19.3.0",

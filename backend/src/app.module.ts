@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { StudentsModule } from './modules/students/students.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
+import { ProgressModule } from './modules/progress/progress.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SessionsModule } from './modules/sessions/sessions.module';
     AuthModule,
     StudentsModule,
     SessionsModule,
+    ProgressModule,
   ],
   controllers: [HealthController],
 })

@@ -12,6 +12,7 @@
     "test:auth": "node scripts/test-auth-flow.cjs",
     "test:students": "node scripts/test-students-flow.cjs",
     "test:sessions": "node scripts/test-session-results-flow.cjs",
+    "test:progress": "node scripts/test-progress-flow.cjs",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate"
   },
