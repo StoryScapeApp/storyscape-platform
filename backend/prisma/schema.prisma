@@ -20,6 +20,7 @@ model Professor {
 model Student {
   id              String           @id @default(uuid()) @db.Uuid
   code            String           @unique
+  name            String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   readingSessions ReadingSession[]
@@ -48,6 +49,13 @@ model ActivityResponse {
   activityRefId String
   attemptNumber Int            @default(1)
   isCorrect     Boolean
+  chosenLetter  String?
+  chapterRefId  String?
+  questionNumber Int?
+  questionType  String?
+  questionText  String?
+  correctLetter String?
+  options       Json?
   answeredAt    DateTime       @default(now())
   session       ReadingSession @relation(fields: [sessionId], references: [id])
 

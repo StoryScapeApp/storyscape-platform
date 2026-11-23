@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { StudentsModule } from './modules/students/students.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { ProgressModule } from './modules/progress/progress.module';
+import { UnityModule } from './modules/unity/unity.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProgressModule } from './modules/progress/progress.module';
     StudentsModule,
     SessionsModule,
     ProgressModule,
+    UnityModule,
   ],
   controllers: [HealthController],
 })

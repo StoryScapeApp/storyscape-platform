@@ -56,5 +56,7 @@ export function validateEnvironment(config: Environment): Environment {
     JWT_EXPIRES_IN: jwtExpiresIn,
     COOKIE_SECURE: cookieSecure === 'true',
     COOKIE_SAME_SITE: cookieSameSite,
+    UNITY_INGEST_KEY: config.UNITY_INGEST_KEY,
+    UNITY_PROFESSOR_EMAIL: config.UNITY_PROFESSOR_EMAIL,
   };
 }

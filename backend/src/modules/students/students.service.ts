@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export interface StudentSummary {
   id: string;
   code: string;
+  name: string | null;
   sessionCount: number;
   lastSessionAt: Date;
 }
@@ -24,7 +25,7 @@ export class StudentsService {
 
     const students = await this.prisma.student.findMany({
       where: { id: { in: aggregates.map(({ studentId }) => studentId) } },
-      select: { id: true, code: true },
+      select: { id: true, code: true, name: true },
     });
     const metrics = new Map(aggregates.map((aggregate) => [aggregate.studentId, aggregate]));
 
@@ -34,6 +35,7 @@ export class StudentsService {
         return {
           id: student.id,
           code: student.code,
+          name: student.name,
           sessionCount: aggregate._count._all,
           lastSessionAt: aggregate._max.startedAt!,
         };
@@ -52,13 +54,14 @@ export class StudentsService {
 
     const student = await this.prisma.student.findUnique({
       where: { id: studentId },
-      select: { id: true, code: true },
+      select: { id: true, code: true, name: true },
     });
     if (!student) return null;
 
     return {
       id: student.id,
       code: student.code,
+      name: student.name,
       sessionCount: aggregate[0]._count._all,
       lastSessionAt: aggregate[0]._max.startedAt!,
     };

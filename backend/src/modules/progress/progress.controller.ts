@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthenticatedRequest } from '../auth/auth.types';
@@ -18,5 +18,15 @@ export class ProgressController {
     @Param('studentId', new ParseUUIDPipe({ version: 'all' })) studentId: string,
   ) {
     return this.progress.getForProfessorAndStudent(request.professor!.id, studentId);
+  }
+
+  @Get(':studentId/progress-detail')
+  @ApiOperation({ summary: 'Obtener el detalle de respuestas y resultados de un estudiante' })
+  getStudentProgressDetail(
+    @Req() request: AuthenticatedRequest,
+    @Param('studentId', new ParseUUIDPipe({ version: 'all' })) studentId: string,
+    @Query('sessionId') sessionId?: string,
+  ) {
+    return this.progress.getDetailForProfessor(request.professor!.id, studentId, sessionId);
   }
 }
