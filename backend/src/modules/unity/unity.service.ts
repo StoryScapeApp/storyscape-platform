@@ -1,7 +1,18 @@
 import { ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { randomInt } from 'node:crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUnitySessionDto, UnityQuestionDto } from './unity.dto';
+
+// Sin 0/O ni 1/I/L para que el docente pueda dictar o leer el código sin confusiones
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const CODE_LENGTH = 6;
+
+function generateStudentCode(): string {
+  let code = '';
+  for (let i = 0; i < CODE_LENGTH; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
+  return `ALUMNO-${code}`;
+}
 
 @Injectable()
 export class UnityService {
@@ -17,9 +28,15 @@ export class UnityService {
 
   async createSession(body: CreateUnitySessionDto) {
     const professor = await this.professor();
-    let student;
-    for (let attempt = 0; attempt < 20; attempt++) {
-      const code = `ALUMNO-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    let student = body.studentCode
+      ? await this.prisma.student.findUnique({ where: { code: body.studentCode } })
+      : null;
+    if (body.studentCode && !student) throw new NotFoundException('No existe un estudiante con ese código.');
+    if (student && body.name?.trim() && !student.name) {
+      student = await this.prisma.student.update({ where: { id: student.id }, data: { name: body.name.trim() } });
+    }
+    for (let attempt = 0; !student && attempt < 20; attempt++) {
+      const code = generateStudentCode();
       try { student = await this.prisma.student.create({ data: { code, name: body.name?.trim() || null } }); break; }
       catch (error) {
         if (!(error instanceof Error) || !('code' in error) || error.code !== 'P2002') throw error;
@@ -37,12 +54,13 @@ export class UnityService {
     const activityRefId = `${body.chapterRefId}:q${body.questionNumber}`;
     await this.prisma.$transaction(async (tx) => {
       await tx.activityResponse.deleteMany({ where: { sessionId, activityRefId } });
-      const attempts = body.attempts.length ? body.attempts : [{ letter: null as unknown as string }];
+      // Sin intentos = pregunta sin responder: se guarda una fila con chosenLetter null
+      const attempts: { letter: string | null }[] = body.attempts.length ? body.attempts : [{ letter: null }];
       await tx.activityResponse.createMany({ data: attempts.map((attempt, index) => ({
         sessionId, activityRefId, attemptNumber: index + 1, chosenLetter: attempt.letter,
         chapterRefId: body.chapterRefId, questionNumber: body.questionNumber, questionType: body.questionType,
         questionText: body.questionText, options: body.options, correctLetter: body.correctLetter,
-        isCorrect: attempt.letter === body.correctLetter,
+        isCorrect: attempt.letter !== null && attempt.letter === body.correctLetter,
       })) });
     });
     return { message: 'Respuestas guardadas correctamente.' };
@@ -63,8 +81,9 @@ export class UnityService {
         scores[type].push(correct ? (correct.attemptNumber === 1 ? 100 : 50) : 0);
       }
       const completedAt = session.completedAt ?? new Date();
-      if (groups.size === 0) {
-        // Sesión sin preguntas respondidas (el niño no llegó a un quiz): se cierra sin puntajes inventados.
+      const typedCount = scores.literal.length + scores.inferencial.length;
+      if (typedCount === 0) {
+        // Sesión sin preguntas literales/inferenciales (el niño no llegó a un quiz): se cierra sin puntajes inventados.
         await tx.readingSession.update({ where: { id: sessionId }, data: { completedAt } });
         return { sessionId, completedAt, result: null };
       }

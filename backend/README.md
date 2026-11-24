@@ -56,6 +56,8 @@ The Unity reading table sends quiz results to this API; the teacher sees them in
 2. Apply the migrations (`npx prisma migrate dev`) and restart the API.
 3. Put the same key and the API URL in the Unity project (`Assets/StreamingAssets/portal.local.json`, see the Unity repo README, section "Portal del docente").
 
+`POST /unity/sessions` returns `{ sessionId, studentId, studentCode }`. Unity should save `studentCode` (for example in `PlayerPrefs`) and send it back as `studentCode` in the body of the next `POST /unity/sessions`, so the same child keeps one student record across sessions. Without it a new student is created; an unknown code answers 404.
+
 Endpoints (header `x-api-key`): `POST /unity/sessions`, `POST /unity/sessions/:id/responses`, `POST /unity/sessions/:id/complete`. Teacher endpoints added for the dashboard and progress screens: `GET /dashboard/summary` and the progress-detail routes under `/progress`.
 
 Checks (API running, seed professor available): `npm run test:unity`, `npm run test:dashboard`. To fill a demo portal with example students (Mateo, Valentina, Sofía, Diego, Lucía) run `npm run seed:demo`; it uses the same ingest API, so `UNITY_INGEST_KEY` must be set.

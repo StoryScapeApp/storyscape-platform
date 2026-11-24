@@ -1,9 +1,11 @@
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateUnitySessionDto {
   @IsOptional() @IsString() @MaxLength(60) name?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(100) bookRefId?: string;
+  // Código devuelto por una sesión anterior: si Unity lo envía, se reutiliza el mismo estudiante
+  @IsOptional() @IsString() @Matches(/^ALUMNO-[A-Z0-9]{4,8}$/) studentCode?: string;
 }
 
 export class AttemptDto {

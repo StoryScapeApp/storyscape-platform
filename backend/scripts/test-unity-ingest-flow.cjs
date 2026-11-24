@@ -30,7 +30,14 @@ async function main() {
 
   const created = await request('/unity/sessions', { method: 'POST', body: { name: '  Prueba Unity  ' } });
   assert.equal(created.response.status, 201);
-  const { sessionId, studentId } = created.data;
+  const { sessionId, studentId, studentCode } = created.data;
+  assert.match(studentCode, /^ALUMNO-[A-Z0-9]{6}$/);
+  const reused = await request('/unity/sessions', { method: 'POST', body: { studentCode } });
+  assert.equal(reused.response.status, 201);
+  assert.equal(reused.data.studentId, studentId, 'Con studentCode se debe reutilizar el mismo estudiante.');
+  assert.notEqual(reused.data.sessionId, sessionId);
+  const unknownCode = await request('/unity/sessions', { method: 'POST', body: { studentCode: 'ALUMNO-ZZZZZZ' } });
+  assert.equal(unknownCode.response.status, 404);
   const questions = [
     { chapterRefId: 'capitulo_1', questionNumber: 1, questionType: 'literal', questionText: '¿Qué vio el principito?', options: ['Un sombrero', 'Una boa', 'Una montaña'], correctLetter: 'B', attempts: [{ letter: 'B' }] },
     { chapterRefId: 'capitulo_1', questionNumber: 2, questionType: 'inferencial', questionText: '¿Qué pensaba el narrador?', options: ['Que era un sombrero', 'Que era una boa', 'Que era una flor'], correctLetter: 'B', attempts: [{ letter: 'A' }, { letter: 'B' }] },
