@@ -11,19 +11,16 @@ const Q = {
     literal: { texto: '¿Qué representaba realmente el dibujo número 1 del narrador?', opciones: ['Un sombrero', 'Una boa digiriendo un elefante', 'Una montaña'], correcta: 1 },
     inferencial: { texto: '¿Cómo se sintió el narrador cuando nadie entendió su dibujo?', opciones: ['Feliz y orgulloso', 'Indiferente', 'Desanimado e incomprendido'], correcta: 2 },
   },
-  capitulo_2: {
-    literal: { texto: '¿Dónde se averió el avión del narrador?', opciones: ['En la selva virgen', 'En medio del océano', 'En el desierto del Sahara'], correcta: 2 },
-    inferencial: { texto: '¿Por qué al principito le gustó el dibujo de la caja?', opciones: ['Porque era el dibujo más bonito', 'Porque podía imaginar al cordero dentro', 'Porque quería guardar sus cosas'], correcta: 1 },
-  },
 };
 // Resultado por pregunta: 1 = acierta al 1.er intento, 2 = al 2.º, 0 = falla los 2, null = sin responder
-// Orden: cap. 1 literal, cap. 1 inferencial, cap. 2 literal, cap. 2 inferencial
+// Los alumnos de ejemplo solo llegan hasta el capítulo 1. Orden: cap. 1 literal, cap. 1 inferencial
+const CAPITULOS = Object.keys(Q);
 const ALUMNOS = [
-  ['Mateo', [1, 1, 1, 1]],
-  ['Valentina', [1, 2, 1, 2]],
-  ['Sofía', [2, 0, 1, 1]],
-  ['Diego', [0, 2, 2, 0]],
-  ['Lucía', [1, 1, null, null]],
+  ['Mateo', [1, 1]],
+  ['Valentina', [1, 2]],
+  ['Sofía', [2, 0]],
+  ['Diego', [0, 2]],
+  ['Lucía', [1, null]],
 ];
 
 async function post(path, body) {
@@ -37,7 +34,7 @@ async function post(path, body) {
   for (const [name, results] of ALUMNOS) {
     const session = await post('/unity/sessions', { name, bookRefId: 'el-principito' });
     let i = 0;
-    for (const chapter of ['capitulo_1', 'capitulo_2']) {
+    for (const chapter of CAPITULOS) {
       for (const [n, type] of [[1, 'literal'], [2, 'inferencial']]) {
         const outcome = results[i++];
         if (outcome === null) continue;
